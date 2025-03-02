@@ -1,18 +1,29 @@
-"use client"
+"use client";
 import React, { useState, useEffect } from "react";
 
 export default function ExpenseTracker() {
   const [initialAmount, setInitialAmount] = useState("");
-  const [cash, setCash] = useState(() => parseFloat(localStorage.getItem("cash")) || 0);
-  const [online, setOnline] = useState(() => parseFloat(localStorage.getItem("online")) || 0);
-  const [transactions, setTransactions] = useState(() => JSON.parse(localStorage.getItem("transactions")) || []);
+  const [cash, setCash] = useState(0);
+  const [online, setOnline] = useState(0);
+  const [transactions, setTransactions] = useState([]);
   const [reason, setReason] = useState("");
   const [amount, setAmount] = useState("");
 
+  // Load data from localStorage when the component mounts
   useEffect(() => {
-    localStorage.setItem("cash", cash);
-    localStorage.setItem("online", online);
-    localStorage.setItem("transactions", JSON.stringify(transactions));
+    if (typeof window !== "undefined") {
+      setCash(parseFloat(localStorage.getItem("cash")) || 0);
+      setOnline(parseFloat(localStorage.getItem("online")) || 0);
+      setTransactions(JSON.parse(localStorage.getItem("transactions")) || []);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("cash", cash);
+      localStorage.setItem("online", online);
+      localStorage.setItem("transactions", JSON.stringify(transactions));
+    }
   }, [cash, online, transactions]);
 
   const handleSetInitialAmount = () => {
@@ -48,7 +59,9 @@ export default function ExpenseTracker() {
     setCash(0);
     setOnline(0);
     setTransactions([]);
-    localStorage.clear();
+    if (typeof window !== "undefined") {
+      localStorage.clear();
+    }
   };
 
   return (
